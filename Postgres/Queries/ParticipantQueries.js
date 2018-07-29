@@ -33,7 +33,7 @@ exports.get_active_participants_for_staff = (staff_id) => {
 exports.insert_staff_participant = (session_id, staff, identifier, proxy_identifier, proxy_identifier_sid) => {
   const p = new Promise((res, rej) => {
     const values = [session_id, staff.staff_id, staff.friendly_name, identifier, proxy_identifier, proxy_identifier_sid]
-    const queryString = `INSERT INTO particpants (session_id, staff_id, friendly_name, identifier, proxy_identifier, proxy_identifier_sid)
+    const queryString = `INSERT INTO participants (session_id, staff_id, friendly_name, identifier, proxy_identifier, proxy_identifier_sid)
                             VALUES ($1, $2, $3, $4, $5, $6)
                           RETURNING participant_id
                         `
@@ -86,9 +86,9 @@ exports.get_active_participants_for_lead = (lead_id) => {
 exports.insert_lead_participant = (session_id, lead, identifier, proxy_identifier, proxy_identifier_sid) => {
   const p = new Promise((res, rej) => {
     const values = [session_id, lead.lead_id, lead.friendly_name, identifier, proxy_identifier, proxy_identifier_sid]
-    const queryString = `INSERT INTO particpants (session_id, lead_id, friendly_name, identifier, proxy_identifier, proxy_identifier_sid)
+    const queryString = `INSERT INTO participants (session_id, lead_id, friendly_name, identifier, proxy_identifier, proxy_identifier_sid)
                             VALUES ($1, $2, $3, $4, $5, $6)
-
+                          RETURNING participant_id
                         `
 
     query(queryString, values, (err, results) => {

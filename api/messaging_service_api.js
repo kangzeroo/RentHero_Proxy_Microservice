@@ -6,7 +6,7 @@ exports.get_numbers_from_pool = () => {
     const service = twilio_client.messaging.services(messagingServiceSid)
     service.phoneNumbers.list()
       .then((numbers) => {
-        console.log(numbers)
+        // console.log(numbers)
         res(numbers)
       })
       .catch((err) => {
@@ -18,7 +18,7 @@ exports.get_numbers_from_pool = () => {
 }
 
 exports.buy_new_number = (country_code, area_code) => {
-  console.log(country_code, area_code)
+  console.log(`==== BUYING A NEW NUMBER WITH country_code: ${country_code}, and area_code: ${area_code}`)
   const p = new Promise((res, rej) => {
 
     let purchasedTwilioNumber
@@ -31,13 +31,33 @@ exports.buy_new_number = (country_code, area_code) => {
         voiceEnabled: true,
       })
       .then((data) => {
-        const number = data[0]
-        // console.log('NUMBER OBJ: ', number)
-        purchasedTwilioNumber = number
-        return twilio_client.incomingPhoneNumbers.create({
-          phoneNumber: number.phoneNumber,
-          // voiceUrl: 'https://rentburrow.com:3006/use-voice',
-        })
+        if (data && data.length > 0) {
+          console.log('===> NUMBER FOUND IN ROUND 1')
+          const number = data[0]
+          console.log('=== SELECTED NUMBER: ', number)
+          purchasedTwilioNumber = number
+          return twilio_client.incomingPhoneNumbers.create({
+            phoneNumber: number.phoneNumber,
+            // voiceUrl: 'https://rentburrow.com:3006/use-voice',
+          })
+        } else {
+          return twilio_client.availablePhoneNumbers(country_code)
+            .local.list({
+              smsEnabled: true,
+              mmsEnabled: true,
+              voiceEnabled: true,
+            })
+              .then((data) => {
+                console.log('===> NUMBER FOUND IN ROUND 2')
+                const number = data[0]
+                console.log('=== SELECTED NUMBER: ', number)
+                purchasedTwilioNumber = number
+                return twilio_client.incomingPhoneNumbers.create({
+                  phoneNumber: number.phoneNumber,
+                  // voiceUrl: 'https://rentburrow.com:3006/use-voice',
+                })
+              })
+        }
       })
       .then((purchasedNumber) => {
         // console.log('PURCHASED NUMBER: ', purchasedNumber)
@@ -48,8 +68,11 @@ exports.buy_new_number = (country_code, area_code) => {
       })
       .then((data) => {
         console.log('DATA: ', data)
-        console.log('PURCHASED NUMBER: ', purchasedTwilioNumber)
-        res(purchasedTwilioNumber)
+        console.log('PURCHASED NUMBER: ', {
+          sid: purchasedTwilioNumber.sid,
+          phoneNumber: purchasedTwilioNumber.phoneNumber,
+        })
+        res(data)
       })
       .catch((err) => {
         console.log(err)
