@@ -1,3 +1,4 @@
+const twilio = require('twilio')
 const bodyParser = require('body-parser')
 
 // security
@@ -9,6 +10,7 @@ const Test = require('./routes/test_routes')
 const LeadsRoutes = require('./routes/leads_routes')
 const ProxyRoutes = require('./routes/proxy_routes')
 const SessionRoutes = require('./routes/session_routes')
+const SMSRoutes = require('./routes/sms_routes')
 
 // bodyParser attempts to parse any request into JSON format
 const json_encoding = bodyParser.json({type:'*/*'})
@@ -17,13 +19,15 @@ const json_encoding = bodyParser.json({type:'*/*'})
 
 module.exports = function(app){
 
+	app.use(bodyParser())
+
 	// tests
 	app.get('/test', json_encoding, Test.test)
 	app.get('/auth_test', [json_encoding, originCheck, Google_JWT_Check], Test.auth_test)
-	app.post('/buy_test', json_encoding, Test.buy_test)
+	// app.post('/buy_test', json_encoding, Test.buy_test)
 
 	// session routes
-	app.post('/create_session', json_encoding, SessionRoutes.create_session)
+	// app.post('/create_session', json_encoding, SessionRoutes.create_session)
 
 	// proxy routes
 	// app.post('/send_message', json_encoding, ProxyRoutes.send_message)
@@ -32,4 +36,8 @@ module.exports = function(app){
 	// app.post('/get_numbers_from_pool', json_encoding, require('./api/messaging_service_api').get_numbers_from_pool)
 	// app.post('/buy', json_encoding, require('./api/messaging_service_api').buy_new_number)
 
+	// SMS routes
+	app.post('/proxy_connect_staff_and_lead', json_encoding, SMSRoutes.proxy_connect_staff_and_lead)
+	app.post('/sms', [twilio.webhook({ validate: false })], SMSRoutes.sms_forwarder)
+	app.post('/fallback', [twilio.webhook({ validate: false })], SMSRoutes.fallback)
 }
