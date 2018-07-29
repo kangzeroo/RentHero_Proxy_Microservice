@@ -20,7 +20,7 @@ module.exports = function(app){
 	// tests
 	app.get('/test', json_encoding, Test.test)
 	app.get('/auth_test', [json_encoding, originCheck, Google_JWT_Check], Test.auth_test)
-	app.post('/email_test', [json_encoding, originCheck], Test.email_test)
+	app.post('/buy_test', json_encoding, Test.buy_test)
 
 	// session routes
 	app.post('/create_session', json_encoding, SessionRoutes.create_session)

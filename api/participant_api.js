@@ -91,7 +91,7 @@ exports.create_lead_participant = (session_id, lead, staff_participant_proxy) =>
   console.log(`========== session_id: ${session_id}`)
   console.log(`========== lead_id: ${lead.lead_id}`)
   console.log(`========== lead_number: ${lead.phone}`)
-  console.log(`========== staff_proxy_identifier: ${staff_participant_proxy.phoneNumber}`)
+  // console.log(`========== staff_proxy_identifier: ${staff_participant_proxy.phoneNumber}`)
   const p = new Promise((res, rej) => {
     let pool_numbers, lead_phone_obj
 
@@ -117,20 +117,21 @@ exports.create_lead_participant = (session_id, lead, staff_participant_proxy) =>
           console.log(`==> No active sessions for this lead, use staff_proxy_identifier`)
 
           // Select the staff participant proxy_identifier
-          return staff_participant_proxy
+          // return staff_participant_proxy
+          return pool_numbers[0]
         } else if (results.rowCount < pool_numbers.length) {
 
-          // If the staff's proxy identifier is used in the lead_participant's active session
-          if (results.rows.filter(row => row.proxy_identifier === staff_participant_proxy.phoneNumber).length > 0) {
-            console.log(`==> staff_proxy_identifier is already being used this lead participant in a session, choose another proxy_identifier from the pool!`)
+          // // If the staff's proxy identifier is used in the lead_participant's active session
+          // if (results.rows.filter(row => row.proxy_identifier === staff_participant_proxy.phoneNumber).length > 0) {
+          //   console.log(`==> staff_proxy_identifier is already being used this lead participant in a session, choose another proxy_identifier from the pool!`)
             const lead_proxy_identifiers = results.rows.map(row => row.proxy_identifier)
 
             // Select a proxy_identifier from the pool that is not already associated with the lead_participants
             return pool_numbers.filter(val => !lead_proxy_identifiers.includes(val.phoneNumber))[0]
-          } else {
-            console.log(`==> staff_proxy_identifier is not being used for this lead participant in a session, use staff_proxy_identifier`)
-            return staff_participant_proxy
-          }
+          // } else {
+          //   console.log(`==> staff_proxy_identifier is not being used for this lead participant in a session, use staff_proxy_identifier`)
+          //   return staff_participant_proxy
+          // }
         } else {
           console.log(`==> more proxy numbers for lead than pool numbers`)
           // Buy a new number from twilio, and allocate this number to the lead_participant

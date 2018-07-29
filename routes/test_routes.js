@@ -12,15 +12,9 @@ exports.auth_test = function(req, res, next){
   })
 }
 
-exports.email_test = function(req, res, next) {
-  require('../api/ses_api').generateInitialEmail('jimmy@renthero.cc', 'jimmehguoo@gmail.com', 'Hi, yes this is available. Plz hurry up', 'Response for Ad')
+exports.buy_test = (req, res, next) => {
+  require('../api/messaging_service_api').buy_new_number('CA', '647')
     .then((data) => {
       console.log(data)
-      res.json({
-        message: 'email successfully sent'
-      })
-    })
-    .catch((err) => {
-      console.log(err)
     })
 }
