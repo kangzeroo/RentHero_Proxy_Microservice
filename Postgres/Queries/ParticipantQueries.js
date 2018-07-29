@@ -114,3 +114,42 @@ exports.insert_lead_participant = (session_id, lead, identifier, proxy_identifie
   })
   return p
 }
+
+exports.get_participant_from_identifiers = (identifier, proxy_identifier) => {
+  const p = new Promise((res, rej) => {
+    const values = [identifier, proxy_identifier]
+    const queryString = `SELECT * FROM participants
+                            WHERE identifier = $1
+                              AND proxy_identifier = $2
+                              AND date_deleted IS NULL
+                        `
+
+    query(queryString, values, (err, results) => {
+      if (err) {
+        console.log(`ERROR FROM ParticipantQueries.get_participant_from_identifiers: `, err)
+        rej(err)
+      }
+      res(results)
+    })
+  })
+  return p
+}
+
+exports.get_other_participant = (session_id, participant_id) => {
+  const p = new Promise((res, rej) => {
+    const values = [session_id, participant_id]
+    const queryString = `SELECT * FROM participants
+                          WHERE session_id = $1
+                            AND participant_id != $2
+                            AND date_deleted IS NULL
+                        `
+    query(queryString, values, (err, results) => {
+      if (err) {
+        console.log(`ERROR FROM ParticipantQueries.get_other_participant: `, err)
+        rej(err)
+      }
+      res(results)
+    })
+  })
+  return p
+}

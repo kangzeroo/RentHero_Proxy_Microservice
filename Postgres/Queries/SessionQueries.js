@@ -31,3 +31,49 @@ exports.create_session = (session_name, status, date_expiry) => {
   })
   return p
 }
+
+exports.update_session_interaction = (session_id, timestamp) => {
+  const p = new Promise((res, rej) => {
+    const values = [session_id, timestamp]
+    const queryString = `UPDATE sessions
+                            SET date_last_interaction = $2,
+                                date_updated = CURRENT_TIMESTAMP,
+                                status = 'in-progress'
+                          WHERE session_id = $1
+                        `
+
+    query(queryString, values, (err, results) => {
+      if (err) {
+        console.log(`ERROR FROM SessionQueries.update_session_interaction: `, err)
+        rej(err)
+      }
+      res({
+        message: 'Successfully updated session'
+      })
+    })
+  })
+  return p
+}
+
+exports.update_session_start = (session_id, timestamp) => {
+  const p = new Promise((res, rej) => {
+    const values = [session_id, timestamp]
+    const queryString = `UPDATE sessions
+                            SET date_started = $2,
+                                date_updated = CURRENT_TIMESTAMP,
+                                status = 'in-progress'
+                          WHERE session_id = $1
+                        `
+
+    query(queryString, values, (err, results) => {
+      if (err) {
+        console.log(`ERROR FROM SessionQueries.update_session_start: `, err)
+        rej(err)
+      }
+      res({
+        message: 'Successfully updated session'
+      })
+    })
+  })
+  return p
+}
