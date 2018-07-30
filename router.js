@@ -38,7 +38,7 @@ module.exports = function(app){
 	// app.post('/buy', json_encoding, require('./api/messaging_service_api').buy_new_number)
 
 	// SMS routes
-	app.post('/proxy_connect_staff_and_lead', json_encoding, SMSRoutes.proxy_connect_staff_and_lead)
+	app.post('/proxy_connect_staff_and_lead', [json_encoding, originCheck, Google_JWT_Check], SMSRoutes.proxy_connect_staff_and_lead)
 	app.post('/sms', [twilio.webhook({ validate: false })], SMSRoutes.sms_forwarder)
 	app.post('/fallback', [twilio.webhook({ validate: false })], SMSRoutes.fallback)
 

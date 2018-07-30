@@ -11,6 +11,7 @@ exports.proxy_connect_staff_and_lead = (req, res, next) => {
   const staff = info.staff        // REQUIRED: staff_id, phone, OPTIONAL: friendly_name
   const lead = info.lead          // REQUIRED: lead_id, phone, OPTIONAL: friendly_name
   const ad = info.ad              // REQUIRED: ad_title, formatted_address, OPTIONAL: ad_unit
+  const message = info.message
 
   const session = {
     session_name: info.session_name,
@@ -26,7 +27,7 @@ exports.proxy_connect_staff_and_lead = (req, res, next) => {
       SessionQueries.update_session_start(data.session_id, moment().format())
 
       // send SMS to both lead and staff
-      return SMSAPI.send_initial_sms_to_staff_and_lead(data.staff_participant, data.lead_participant, ad)
+      return SMSAPI.send_initial_sms_to_staff_and_lead(data.staff_participant, data.lead_participant, ad, message)
     })
     .then((data) => {
       res.json(data)

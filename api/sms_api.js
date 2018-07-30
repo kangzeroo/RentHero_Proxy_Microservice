@@ -20,7 +20,7 @@ const SessionQueries = require('../Postgres/Queries/SessionQueries')
       - SENDER_CONTACT
 */
 
-exports.send_initial_sms_to_staff_and_lead = (staff_participant, lead_participant, ad) => {
+exports.send_initial_sms_to_staff_and_lead = (staff_participant, lead_participant, ad, message) => {
   const p = new Promise((res, rej) => {
 
     initialMessage.generate_intial_staff_message(lead_participant.lead, staff_participant.staff, '', ad)
@@ -28,7 +28,7 @@ exports.send_initial_sms_to_staff_and_lead = (staff_participant, lead_participan
         return send_sms_to_staff(staff_participant, body, lead_participant)
       })
       .then((data) => {
-        return initialMessage.generate_initial_lead_message(lead_participant.lead, staff_participant.staff, '', ad)
+        return initialMessage.generate_initial_lead_message(lead_participant.lead, staff_participant.staff, '', ad, message)
       })
       .then((body) => {
         return send_sms_to_lead(lead_participant, body, staff_participant)
