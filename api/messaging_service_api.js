@@ -38,7 +38,7 @@ exports.buy_new_number = (country_code, area_code) => {
           purchasedTwilioNumber = number
           return twilio_client.incomingPhoneNumbers.create({
             phoneNumber: number.phoneNumber,
-            // voiceUrl: 'https://rentburrow.com:3006/use-voice',
+            voiceUrl: 'https://rentheros.com:7104/voice',
           })
         } else {
           return twilio_client.availablePhoneNumbers(country_code)
@@ -54,7 +54,7 @@ exports.buy_new_number = (country_code, area_code) => {
                 purchasedTwilioNumber = number
                 return twilio_client.incomingPhoneNumbers.create({
                   phoneNumber: number.phoneNumber,
-                  // voiceUrl: 'https://rentburrow.com:3006/use-voice',
+                  voiceUrl: 'https://rentheros.com:7104/voice',
                 })
               })
         }
