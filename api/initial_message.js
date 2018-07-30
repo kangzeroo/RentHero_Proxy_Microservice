@@ -1,9 +1,9 @@
 
-exports.generate_initial_lead_message = (lead, staff, message, ad) => {
+exports.generate_initial_lead_message = (lead, staff, message, ad, msg) => {
   const p = new Promise((res, rej) => {
     let hello = `Hello ${lead.friendly_name}, this is ${staff.friendly_name}, `
     let admsg = `the leasing agent for ${ad.ad_title ? `${ad.ad_title}${ad.ad_unit ? ` (Unit ${ad.ad_unit})` : ''} at ${ad.formatted_address}` : ad.formatted_address }. `
-    let tourmsg = `Let's set up a tour time here! `
+    let tourmsg = `Let's set up a tour time here! ${msg ? msg : ''}`
 
     if (message) {
       res(hello + admsg + tourmsg + message)
