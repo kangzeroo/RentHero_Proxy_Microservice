@@ -88,6 +88,9 @@ exports.sms_forwarder = function(req, res, next) {
       res.type('text/xml');
       res.send(twiml_client.toString())
     })
+    .catch((err) => {
+      console.log(err)
+    })
 }
 
 

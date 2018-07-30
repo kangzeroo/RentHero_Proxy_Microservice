@@ -153,3 +153,22 @@ exports.get_other_participant = (session_id, participant_id) => {
   })
   return p
 }
+
+exports.get_participant = (participant_id) => {
+  const p = new Promise((res, rej) => {
+    const values = [participant_id]
+    const queryString = `SELECT * FROM participants
+                          WHERE participant_id = $1
+                            AND date_deleted IS NULL
+                         `
+
+    query(queryString, values, (err, results) => {
+      if (err) {
+        console.log(`ERROR FROM ParticipantQueries.get_participant: `, err)
+        rej(err)
+      }
+      res(results)
+    })
+  })
+  return p
+}
