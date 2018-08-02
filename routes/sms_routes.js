@@ -2,6 +2,7 @@ const moment = require('moment')
 const SessionAPI = require('../api/session_api')
 const SessionQueries = require('../Postgres/Queries/SessionQueries')
 const ParticipantQueries = require('../Postgres/Queries/ParticipantQueries')
+const TourQueries = require('../Postgres/Queries/TourQueries')
 const SMSAPI = require('../api/sms_api')
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 
@@ -10,8 +11,10 @@ exports.proxy_connect_staff_and_lead = (req, res, next) => {
   const info = req.body
   const staff = info.staff        // REQUIRED: staff_id, phone, OPTIONAL: friendly_name
   const lead = info.lead          // REQUIRED: lead_id, phone, OPTIONAL: friendly_name
-  const ad = info.ad              // REQUIRED: ad_title, formatted_address, OPTIONAL: ad_unit
-  const message = info.message
+  const ad = info.ad              // REQUIRED: ad_title, formatted_address, short_address OPTIONAL: ad_unit
+  const messages = info.messages  // REQUIRED: lead_message, staff_message
+  const tour = info.tour          // REQUIRED: tour_begin, tour_end
+  const corporation_id = info.corporation_id  // REQUIRED
 
   const session = {
     session_name: info.session_name,
@@ -19,22 +22,29 @@ exports.proxy_connect_staff_and_lead = (req, res, next) => {
     date_expiry: info.date_expiry,
   }
 
+  let session_id
+
   // CREATE SESSION FIRST
-  SessionAPI.create_session(staff, lead, session)
+  SessionAPI.create_session(staff, lead, session, corporation_id)
     .then((data) => {
       console.log(data.message)
+      session_id = data.session_id
 
       SessionQueries.update_session_start(data.session_id, moment().format())
 
       // send SMS to both lead and staff
-      return SMSAPI.send_initial_sms_to_staff_and_lead(data.staff_participant, data.lead_participant, ad, message)
+      return SMSAPI.send_initial_sms_to_staff_and_lead(data.staff_participant, data.lead_participant, ad, messages)
     })
     .then((data) => {
+      return TourQueries.insert_tour(session_id, ad, tour, lead.friendly_name, staff.friendly_name)
+    })
+    .then((data) => {
+      console.log(data.message)
       res.json(data)
     })
     .catch((err) => {
       console.log(`ERROR FROM sms_routes.proxy_connect_staff_and_lead: `, err)
-      res.status(500).send('Failed to send connect staff and lead')
+      res.status(500).send('Failed to send create tour')
     })
 }
 
