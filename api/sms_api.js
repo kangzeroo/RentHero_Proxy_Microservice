@@ -20,18 +20,12 @@ const SessionQueries = require('../Postgres/Queries/SessionQueries')
       - SENDER_CONTACT
 */
 
-exports.send_initial_sms_to_staff_and_lead = (staff_participant, lead_participant, ad, message) => {
+exports.send_initial_sms_to_staff_and_lead = (staff_participant, lead_participant, ad, messages) => {
   const p = new Promise((res, rej) => {
 
-    initialMessage.generate_intial_staff_message(lead_participant.lead, staff_participant.staff, '', ad)
-      .then((body) => {
-        return send_sms_to_staff(staff_participant, body, lead_participant)
-      })
+    send_sms_to_staff(staff_participant, messages.staff_message, lead_participant)
       .then((data) => {
-        return initialMessage.generate_initial_lead_message(lead_participant.lead, staff_participant.staff, '', ad, message)
-      })
-      .then((body) => {
-        return send_sms_to_lead(lead_participant, body, staff_participant)
+        return send_sms_to_lead(lead_participant, messages.lead_message, staff_participant)
       })
       .then(() => {
         res({
@@ -74,7 +68,9 @@ const send_sms_to_staff = (staff_participant, body, lead_participant) => {
 
           'SENDER_ID': lead_participant.lead.lead_id,
           'SENDER_CONTACT': lead_participant.identifier,
-          'SENDER_TYPE': 'LEAD_ID'
+          'SENDER_TYPE': 'LEAD_ID',
+
+          'SESSION_ID': lead_participant.session_id
         }, CONVO_HISTORY)
     })
     .then(() => {
@@ -115,7 +111,9 @@ const send_sms_to_lead = (lead_participant, body, staff_participant) => {
 
         'SENDER_ID': staff_participant.staff.staff_id,
         'SENDER_CONTACT': staff_participant.identifier,
-        'SENDER_TYPE': 'STAFF_ID'
+        'SENDER_TYPE': 'STAFF_ID',
+
+        'SESSION_ID': lead_participant.session_id
       }, CONVO_HISTORY)
     })
     .then(() => {
@@ -160,7 +158,9 @@ exports.forward_message = (sender, receiver, body) => {
           'SENDER_ID': sender.staff_id ? sender.staff_id : sender.lead_id,
           'SENDER_CONTACT': sender.identifier,
           'SENDER_TYPE': sender.staff_id ? 'STAFF_ID' : 'LEAD_ID',
-          'SENDER_PROXY': sender.proxy_identifier
+          'SENDER_PROXY': sender.proxy_identifier,
+
+          'SESSION_ID': sender.session_id
         }, CONVO_HISTORY)
       })
       .then(() => {

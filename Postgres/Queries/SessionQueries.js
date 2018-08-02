@@ -10,12 +10,12 @@ const moment = require('moment')
 
 const query = promisify(pool.query)
 
-exports.create_session = (session_name, status, date_expiry) => {
+exports.create_session = (session_name, status, date_expiry, corporation_id) => {
   const p = new Promise((res, rej) => {
     const session_id = uuid.v4()
-    const values = [session_id, session_name, status, date_expiry]
-    const queryString = `INSERT INTO sessions (session_id, session_name, status, date_expiry)
-                          VALUES ($1, $2, $3, $4)
+    const values = [session_id, session_name, status, date_expiry, corporation_id]
+    const queryString = `INSERT INTO sessions (session_id, session_name, status, date_expiry, corporation_id)
+                          VALUES ($1, $2, $3, $4, $5)
                         `
 
     query(queryString, values, (err, results) => {

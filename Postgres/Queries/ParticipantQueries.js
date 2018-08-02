@@ -172,3 +172,14 @@ exports.get_participant = (participant_id) => {
   })
   return p
 }
+
+exports.fallback = () => {
+  const p = new Promise((res, rej) => {
+    res({
+      data: {
+        rowCount: 0
+      }
+    })
+  })
+  return p
+}

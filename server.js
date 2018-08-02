@@ -64,7 +64,7 @@ if (process.env.NODE_ENV === 'production') {
       rejectUnauthorized: false
   }
   // const server = https.createServer(options, app)
-  const server = https.createServer(options, app)
+  const server = http.createServer(app)
 
   // listen to the server on port
   server.listen(port, function(){

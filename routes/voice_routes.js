@@ -3,12 +3,15 @@ const uuid = require('uuid')
 const moment = require('moment')
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 const ParticipantQueries = require('../Postgres/Queries/ParticipantQueries')
+const SessionQueries = require('../Postgres/Queries/SessionQueries')
+const TourQueries = require('../Postgres/Queries/TourQueries')
 const VoiceAPI = require('../api/voice_api')
 const insertIntel = require('../DynamoDB/general_insertions').insertIntel
 const CONVO_HISTORY = require('../DynamoDB/dynamodb_tablenames').CONVO_HISTORY
 
 exports.voice_forwarder = function(req, res, next) {
   console.log('/voice_forwarder')
+  // based on call-forwarding-node: https://github.com/TwilioDevEd/call-forwarding-node/blob/master/routes/index.js
 
   let from = req.body.From
   let to   = req.body.To
@@ -26,6 +29,7 @@ exports.voice_forwarder = function(req, res, next) {
         return ParticipantQueries.get_other_participant(sender.session_id, sender.participant_id)
       } else {
         console.log('=== INCORRECT ROW COUNT (STEP 1): ', data.rows)
+        return ParticipantQueries.fallback()
       }
     })
     .then((data) => {
@@ -38,6 +42,7 @@ exports.voice_forwarder = function(req, res, next) {
         return VoiceAPI.forward_call(sender, receiver)
       } else {
         console.log('=== INCORRECT ROW COUNT (STEP 2): ', data.rows)
+        return VoiceAPI.call_fallback()
       }
     })
     .then((voiceResponse) => {
@@ -84,7 +89,7 @@ exports.dial_callback = (req, res, next) => {
       receiver = data.rows[0]
       console.log('==> RECEIVER: ', receiver)
 
-      update_session_interaction(session_id, moment().format())
+      SessionQueries.update_session_interaction(session_id, moment().format())
 
       return insertIntel({
         'SES_MESSAGE_ID': callbackObj.CallSid,
@@ -103,6 +108,8 @@ exports.dial_callback = (req, res, next) => {
         'SENDER_ID': sender.staff_id ? sender.staff_id : sender.lead_id,
         'SENDER_CONTACT': sender.identifier,
         'SENDER_TYPE': sender.staff_id ? 'STAFF_ID' : 'LEAD_ID',
+
+        'SESSION_ID': session_id,
 
         'META': JSON.stringify(callbackObj)
       }, CONVO_HISTORY)

@@ -4,12 +4,12 @@ const SessionQueries = require('../Postgres/Queries/SessionQueries')
 const ParticipantAPI = require('./participant_api')
 
 
-exports.create_session = (staff, lead, session) => {
+exports.create_session = (staff, lead, session, corporation_id) => {
   const p = new Promise((res, rej) => {
     let session_id, staff_participant, lead_participant
 
     console.log(`CREATING SESSION...`)
-    SessionQueries.create_session(session.session_name, session.status, session.date_expiry)
+    SessionQueries.create_session(session.session_name, session.status, session.date_expiry, corporation_id)
       .then((data) => {
         console.log('SESSION CREATED, NOW ADD STAFF PARTICIPANT')
         console.log(data)
