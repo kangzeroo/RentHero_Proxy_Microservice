@@ -11,6 +11,7 @@ const ProxyRoutes = require('./routes/proxy_routes')
 const SessionRoutes = require('./routes/session_routes')
 const SMSRoutes = require('./routes/sms_routes')
 const VoiceRoutes = require('./routes/voice_routes')
+const PhoneNumberRoutes = require('./routes/phone_number_routes')
 
 // bodyParser attempts to parse any request into JSON format
 const json_encoding = bodyParser.json({type:'*/*'})
@@ -35,5 +36,9 @@ module.exports = function(app){
 	app.post('/voice', [twilio.webhook({ validate: false })], VoiceRoutes.voice_forwarder)
 	app.post('/dial_callback/session/:session_id/sender/:sender_id', VoiceRoutes.dial_callback)
 	app.post('/recording_callback', [twilio.webhook({ validate: false })], VoiceRoutes.recording_callback)
+
+	// Phone Routes
+	app.post('/show_available_country_numbers', [json_encoding, originCheck, Google_JWT_Check], PhoneNumberRoutes.show_available_country_numbers)
+	app.post('/buy_selected_number', [json_encoding, originCheck], PhoneNumberRoutes.buy_selected_number)
 
 }

@@ -7,6 +7,9 @@ exports.generate_twilio_client = () => {
   return new twilio(twilio_config.accountSid, twilio_config.authToken)
 }
 
-exports.get_messaging_service_sid = () => {
-  return twilio_config.messageServiceSid
+exports.get_proxy_messaging_service_sid = () => {
+  return twilio_config.proxyMessageServiceSid
+}
+exports.get_numbers_messaging_service_sid = () => {
+  return twilio_config.numbersMessageServiceSid
 }

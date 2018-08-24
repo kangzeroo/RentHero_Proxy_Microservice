@@ -1,5 +1,5 @@
 const twilio_client = require('../twilio_setup').generate_twilio_client()
-const messagingServiceSid = require('../twilio_setup').get_messaging_service_sid()
+const messagingServiceSid = require('../twilio_setup').get_proxy_messaging_service_sid()
 
 exports.get_numbers_from_pool = () => {
   const p = new Promise((res, rej) => {
