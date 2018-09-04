@@ -18,3 +18,14 @@ exports.buy_test = (req, res, next) => {
       console.log(data)
     })
 }
+
+exports.lookup_number = (req, res, next) => {
+  require('../api/lookup_api').lookup_number(req.body.number)
+    .then((data) => {
+      res.json(data)
+    })
+    .catch((err) => {
+      console.log(err)
+      res.status(500).send('Invalid Phone Number!')
+    })
+}
