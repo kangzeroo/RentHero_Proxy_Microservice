@@ -3,6 +3,7 @@ const messagingServiceSid = require('../twilio_setup').get_numbers_messaging_ser
 
 
 exports.lookup_number = (number) => {
+  // console.log('lookup: ', number)
   const p = new Promise((res, rej) => {
     twilio_client.lookups.phoneNumbers(number)
               .fetch()

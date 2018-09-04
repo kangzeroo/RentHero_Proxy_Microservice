@@ -23,6 +23,7 @@ exports.buy_selected_number = (req, res, next) => {
 
   LookupAPI.buy_selected_number(info.corporation_id, info.selected_number)
     .then((data) => {
+      console.log(data)
       boughtRes = data
 
       return ProxyQueries.update_proxy_number(info.proxy_id, data.purchasedNumber.phoneNumber)

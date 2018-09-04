@@ -26,6 +26,7 @@ module.exports = function(app){
 	app.get('/test', json_encoding, Test.test)
 	app.get('/auth_test', [json_encoding, originCheck, Google_JWT_Check], Test.auth_test)
 	// app.post('/buy_test', json_encoding, Test.buy_test)
+	app.post('/lookup_number', json_encoding, Test.lookup_number)
 
 	// SMS routes
 	app.post('/proxy_connect_staff_and_lead', [json_encoding, originCheck, Google_JWT_Check], SMSRoutes.proxy_connect_staff_and_lead)
