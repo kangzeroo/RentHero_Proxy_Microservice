@@ -58,7 +58,7 @@ exports.buy_selected_number = (corporation_id, selected_number) => {
     twilio_client.incomingPhoneNumbers.create({
       friendlyName: `Proxy For Corp:${corporation_id}`,
       phoneNumber: selected_number,
-      voiceUrl: '',
+      voiceApplicationSid: 'AP11e5d3838a054a46ae337bc113ee5d5a',
     })
     .then((purchasedNumber) => {
       console.log(purchasedNumber)
