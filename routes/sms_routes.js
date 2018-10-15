@@ -11,9 +11,9 @@ exports.proxy_connect_staff_and_lead = (req, res, next) => {
   const info = req.body
   const staff = info.staff        // REQUIRED: staff_id, phone, OPTIONAL: friendly_name
   const lead = info.lead          // REQUIRED: lead_id, phone, OPTIONAL: friendly_name
-  const ad = info.ad              // REQUIRED: ad_title, formatted_address, short_address OPTIONAL: ad_unit
+  // const ad = info.ad              // REQUIRED: ad_title, formatted_address, short_address OPTIONAL: ad_unit
   const messages = info.messages  // REQUIRED: lead_message, staff_message
-  const tour = info.tour          // REQUIRED: tour_begin, tour_end
+  // const tour = info.tour          // REQUIRED: tour_begin, tour_end
   const corporation_id = info.corporation_id  // REQUIRED
 
   const session = {
@@ -33,11 +33,11 @@ exports.proxy_connect_staff_and_lead = (req, res, next) => {
       SessionQueries.update_session_start(data.session_id, moment().format())
 
       // send SMS to both lead and staff
-      return SMSAPI.send_initial_sms_to_staff_and_lead(data.staff_participant, data.lead_participant, ad, messages)
+      return SMSAPI.send_initial_sms_to_staff_and_lead(data.staff_participant, data.lead_participant, messages)
     })
-    .then((data) => {
-      return TourQueries.insert_tour(session_id, ad, tour, lead.friendly_name, staff.friendly_name)
-    })
+    // .then((data) => {
+    //   return TourQueries.insert_tour(session_id, ad, tour, lead.friendly_name, staff.friendly_name)
+    // })
     .then((data) => {
       console.log(data.message)
       res.json(data)
