@@ -20,7 +20,7 @@ const SessionQueries = require('../Postgres/Queries/SessionQueries')
       - SENDER_CONTACT
 */
 
-exports.send_initial_sms_to_staff_and_lead = (staff_participant, lead_participant, ad, messages) => {
+exports.send_initial_sms_to_staff_and_lead = (staff_participant, lead_participant, messages) => {
   const p = new Promise((res, rej) => {
 
     send_sms_to_staff(staff_participant, messages.staff_message, lead_participant)
@@ -43,15 +43,64 @@ exports.send_initial_sms_to_staff_and_lead = (staff_participant, lead_participan
 
 const send_sms_to_staff = (staff_participant, body, lead_participant) => {
   const p = new Promise((res, rej) => {
+    if (body && body.length > 0) {
+      twilio_client.messages.create({
+        body: body,
+        to: staff_participant.identifier,
+        from: staff_participant.proxy_identifier,
+        // messagingServiceSid: messagingServiceSid // From a valid Twilio number
+      })
+      .then((message) => {
+        // console.log(message)
+          return insertIntel({
+            'SES_MESSAGE_ID': message.sid,
+            'TIMESTAMP': moment().format(),
+            'MEDIUM': 'SMS',
 
-    twilio_client.messages.create({
-      body: body,
-      to: staff_participant.identifier,
-      from: staff_participant.proxy_identifier,
-      // messagingServiceSid: messagingServiceSid // From a valid Twilio number
-    })
-    .then((message) => {
-      // console.log(message)
+            'MESSAGE': body,
+
+            'PROXY_ID': staff_participant.session_id,
+            'PROXY_CONTACT': staff_participant.proxy_identifier,
+
+            'RECEIVER_ID': staff_participant.staff.staff_id,
+            'RECEIVER_CONTACT': staff_participant.identifier,
+            'RECEIVER_TYPE': 'STAFF_ID',
+
+            'SENDER_ID': lead_participant.lead.lead_id,
+            'SENDER_CONTACT': lead_participant.identifier,
+            'SENDER_TYPE': 'LEAD_ID',
+
+            'SESSION_ID': lead_participant.session_id
+          }, CONVO_HISTORY)
+      })
+      .then(() => {
+        res({
+          message: `Successfully sent text message`
+        })
+      })
+      .catch((err) => {
+        console.log(`ERROR FROM smsAPI.send_sms_to_staff: `, err)
+        rej(err)
+      })
+    } else {
+      res({
+        message: 'No text sent'
+      })
+    }
+  })
+  return p
+}
+
+const send_sms_to_lead = (lead_participant, body, staff_participant) => {
+  const p = new Promise((res, rej) => {
+    if (body && body.length > 0) {
+      twilio_client.messages.create({
+        body: body,
+        to: lead_participant.identifier,
+        from: lead_participant.proxy_identifier,
+        // messagingServiceSid: messagingServiceSid // From a valid Twilio number
+      })
+      .then((message) => {
         return insertIntel({
           'SES_MESSAGE_ID': message.sid,
           'TIMESTAMP': moment().format(),
@@ -59,72 +108,35 @@ const send_sms_to_staff = (staff_participant, body, lead_participant) => {
 
           'MESSAGE': body,
 
-          'PROXY_ID': staff_participant.session_id,
-          'PROXY_CONTACT': staff_participant.proxy_identifier,
+          'PROXY_ID': lead_participant.session_id,
+          'PROXY_CONTACT': lead_participant.proxy_identifier,
 
-          'RECEIVER_ID': staff_participant.staff.staff_id,
-          'RECEIVER_CONTACT': staff_participant.identifier,
-          'RECEIVER_TYPE': 'STAFF_ID',
+          'RECEIVER_ID': lead_participant.lead.lead_id,
+          'RECEIVER_CONTACT': lead_participant.identifier,
+          'RECEIVER_TYPE': 'LEAD_ID',
 
-          'SENDER_ID': lead_participant.lead.lead_id,
-          'SENDER_CONTACT': lead_participant.identifier,
-          'SENDER_TYPE': 'LEAD_ID',
+          'SENDER_ID': staff_participant.staff.staff_id,
+          'SENDER_CONTACT': staff_participant.identifier,
+          'SENDER_TYPE': 'STAFF_ID',
 
           'SESSION_ID': lead_participant.session_id
         }, CONVO_HISTORY)
-    })
-    .then(() => {
-      res({
-        message: `Successfully sent text message`
       })
-    })
-    .catch((err) => {
-      console.log(`ERROR FROM smsAPI.send_sms_to_staff: `, err)
-      rej(err)
-    })
-  })
-  return p
-}
-
-const send_sms_to_lead = (lead_participant, body, staff_participant) => {
-  const p = new Promise((res, rej) => {
-    twilio_client.messages.create({
-      body: body,
-      to: lead_participant.identifier,
-      from: lead_participant.proxy_identifier,
-      // messagingServiceSid: messagingServiceSid // From a valid Twilio number
-    })
-    .then((message) => {
-      return insertIntel({
-        'SES_MESSAGE_ID': message.sid,
-        'TIMESTAMP': moment().format(),
-        'MEDIUM': 'SMS',
-
-        'MESSAGE': body,
-
-        'PROXY_ID': lead_participant.session_id,
-        'PROXY_CONTACT': lead_participant.proxy_identifier,
-
-        'RECEIVER_ID': lead_participant.lead.lead_id,
-        'RECEIVER_CONTACT': lead_participant.identifier,
-        'RECEIVER_TYPE': 'LEAD_ID',
-
-        'SENDER_ID': staff_participant.staff.staff_id,
-        'SENDER_CONTACT': staff_participant.identifier,
-        'SENDER_TYPE': 'STAFF_ID',
-
-        'SESSION_ID': lead_participant.session_id
-      }, CONVO_HISTORY)
-    })
-    .then(() => {
-      res({
-        message: `Successfully sent text message`
+      .then(() => {
+        res({
+          message: `Successfully sent text message`
+        })
       })
-    })
-    .catch((err) => {
-      console.log(`ERROR FROM smsAPI.send_sms_to_lead: `, err)
-      rej(err)
-    })
+      .catch((err) => {
+        console.log(`ERROR FROM smsAPI.send_sms_to_lead: `, err)
+        rej(err)
+      })
+    } else {
+      res({
+        message: 'No text sent',
+      })
+    }
+
   })
   return p
 }
