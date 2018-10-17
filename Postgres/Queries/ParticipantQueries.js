@@ -35,6 +35,7 @@ exports.insert_staff_participant = (session_id, staff, identifier, proxy_identif
     const values = [session_id, staff.staff_id, staff.friendly_name, identifier, proxy_identifier, proxy_identifier_sid]
     const queryString = `INSERT INTO participants (session_id, staff_id, friendly_name, identifier, proxy_identifier, proxy_identifier_sid)
                             VALUES ($1, $2, $3, $4, $5, $6)
+                            ON CONFLICT (identifier, proxy_identifier) DO NOTHING
                           RETURNING participant_id
                         `
 
