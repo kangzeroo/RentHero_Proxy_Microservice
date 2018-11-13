@@ -42,4 +42,6 @@ module.exports = function(app){
 	app.post('/show_available_country_numbers', [json_encoding, originCheck, Google_JWT_Check], PhoneNumberRoutes.show_available_country_numbers)
 	app.post('/buy_selected_number', [json_encoding, originCheck], PhoneNumberRoutes.buy_selected_number)
 
+	// Proxy Routes
+	app.post('/send_initial_message_from_assistant', [json_encoding, originCheck, Google_JWT_Check], ProxyRoutes.send_initial_message_from_assistant)
 }
