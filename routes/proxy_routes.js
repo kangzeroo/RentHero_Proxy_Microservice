@@ -14,9 +14,7 @@ exports.send_initial_message_from_assistant = (req, res, next) => {
   const staff_phone = info.staff_phone
   const staff_name = info.staff_name
 
-  const msgBody = `Hello ${staff_name}, this is your RentHero Assistant's number. You can message or call your assistant here.
-                   Text or email leads to ${proxy_email}, or use our contact info on your marketing materials.
-                   If you have any listings, you can email your assistant the URLs!`
+  const msgBody = `Hello ${staff_name}, I am Patrick, your RentHero assistant. You can tell me who to contact, or use my number on your ads!`
 
   twilio_client.messages
   .create({
